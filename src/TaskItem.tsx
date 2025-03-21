@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Trash2, CheckCircle, Circle, Edit, Save, X } from 'lucide-react';
+import React, { useState } from 'react'
+import { Trash, CheckCircle, Circle, Edit } from 'lucide-react'
 
 interface Task {
   id: number;
@@ -24,98 +24,74 @@ const TaskItem: React.FC<TaskItemProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(task.text);
 
-  const priorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-red-500';
-      case 'medium':
-        return 'bg-yellow-500';
-      case 'low':
-        return 'bg-green-500';
-      default:
-        return 'bg-gray-500';
+    const handleUpdate = () => {
+    if (editedText.trim()) {
+      updateTask(task.id, editedText);
+      setIsEditing(false);
     }
   };
 
-  const handleSave = () => {
-    updateTask(task.id, editedText);
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    setEditedText(task.text); // Reset to original text
-  };
+  const priorityColor =
+    task.priority === 'high'
+      ? 'bg-red-500'
+      : task.priority === 'medium'
+      ? 'bg-yellow-500'
+      : 'bg-green-500';
 
   return (
-    <li className="flex items-center justify-between p-4 bg-white rounded-md shadow-sm">
-      <div className="flex items-center space-x-4">
+    <li className="flex items-center justify-between p-2 bg-white rounded-md shadow-sm">
+      <div className="flex items-center space-x-2">
         <button
           onClick={() => toggleComplete(task.id)}
-          className="text-indigo-600 hover:text-indigo-800"
+          className={`rounded-full focus:outline-none ${
+            task.completed ? 'bg-green-200' : 'border border-gray-300'
+          }`}
         >
           {task.completed ? (
-            <CheckCircle className="h-6 w-6" />
+            <CheckCircle className="h-5 w-5 text-green-600" />
           ) : (
-            <Circle className="h-6 w-6" />
+            <Circle className="h-5 w-5 text-gray-400" />
           )}
         </button>
-
+        <span className={`w-1 h-5 rounded-full mr-2 ${priorityColor}`}></span>
         {isEditing ? (
           <input
             type="text"
             value={editedText}
             onChange={(e) => setEditedText(e.target.value)}
-            className="text-gray-900 border rounded p-1"
+            onBlur={handleUpdate}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleUpdate();
+              }
+            }}
+            autoFocus
+            className="text-sm border rounded-md p-1"
           />
         ) : (
           <span
-            className={
-              task.completed ? 'line-through text-gray-500' : 'text-gray-900'
-            }
+            className={`text-sm ${
+              task.completed ? 'line-through text-gray-400' : 'text-gray-900'
+            }`}
           >
             {task.text}
           </span>
         )}
-
-        <span
-          className={`ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${priorityColor(
-            task.priority
-          )} text-white`}
-        >
-          {task.priority}
-        </span>
       </div>
-
       <div>
-        {isEditing ? (
-          <>
-            <button
-              onClick={handleSave}
-              className="text-green-600 hover:text-green-800 mr-2"
-            >
-              <Save className="h-6 w-6" />
-            </button>
-            <button
-              onClick={handleCancel}
-              className="text-red-600 hover:text-red-800"
-            >
-              <X className="h-6 w-6" />
-            </button>
-          </>
-        ) : (
+        {isEditing ? null : (
           <button
             onClick={() => setIsEditing(true)}
-            className="text-blue-600 hover:text-blue-800 mr-2"
+            className="text-gray-600 hover:text-blue-500 p-1 rounded-md focus:outline-none"
           >
-            <Edit className="h-6 w-6" />
+            <Edit className="h-4 w-4" />
           </button>
         )}
         <button
           onClick={() => deleteTask(task.id)}
-          className="text-red-600 hover:text-red-800"
+          className="text-gray-600 hover:text-red-500 p-1 rounded-md focus:outline-none"
         >
-          <Trash2 className="h-6 w-6" />
+          <Trash className="h-4 w-4" />
         </button>
       </div>
     </li>
