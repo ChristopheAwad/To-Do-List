@@ -1,3 +1,45 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .task-item {
+    @apply p-3 rounded-lg shadow-sm transition-all duration-200 ease-in-out hover:shadow-md;
+  }
+  
+  .task-item-completed {
+    @apply bg-gray-50 dark:bg-gray-800;
+  }
+  
+  .task-item-pending {
+    @apply bg-white dark:bg-gray-900;
+  }
+  
+  .priority-dot {
+    @apply w-2 h-2 rounded-full mr-2;
+  }
+  
+  .priority-high {
+    @apply bg-red-500;
+  }
+  
+  .priority-medium {
+    @apply bg-yellow-500;
+  }
+  
+  .priority-low {
+    @apply bg-green-500;
+  }
+  
+  .search-input {
+    @apply w-full rounded-lg border border-gray-200 dark:border-gray-700 pl-10 pr-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-600 dark:focus:border-blue-600 transition-all duration-200;
+  }
+  
+  .dark-mode-toggle {
+    @apply relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  }
+  
+  .dark-mode-toggle-thumb {
+    @apply inline-block h-4 w-4 transform rounded-full bg-white transition-transform;
+  }
+}
