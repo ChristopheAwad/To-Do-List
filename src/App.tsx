@@ -16,7 +16,7 @@ type SortType = 'alphabetical' | 'priority';
 type SortDirection = 'asc' | 'desc';
 
 function App() {
-  const [lists, setLists] = useState({ "My Tasks": [] });
+  const [lists, setLists] = useState<{ [key: string]: Task[] }>({ "My Tasks": [] });
   const [currentList, setCurrentList] = useState("My Tasks");
   const [tasks, setTasks] = useState<Task[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,6 +37,8 @@ function App() {
     const storedTasks = localStorage.getItem(`${currentList}-tasks`);
     if (storedTasks) {
       setTasks(JSON.parse(storedTasks));
+    } else {
+      setTasks([]);
     }
   }, [currentList]);
 
@@ -80,13 +82,23 @@ function App() {
   const createList = () => {
     const newListName = prompt("Enter new list name:");
     if (newListName) {
-      setLists({ ...lists, [newListName]: [] });
+      if (lists[newListName]) {
+        alert("A list with this name already exists!");
+        return;
+      }
+      const updatedLists = { ...lists, [newListName]: [] };
+      setLists(updatedLists);
       setCurrentList(newListName);
+      setTasks([]);
     }
   };
 
   const renameList = (oldName: string, newName: string) => {
     if (newName) {
+      if (lists[newName]) {
+        alert("A list with this name already exists!");
+        return;
+      }
       const updatedLists = { ...lists };
       updatedLists[newName] = updatedLists[oldName];
       delete updatedLists[oldName];
