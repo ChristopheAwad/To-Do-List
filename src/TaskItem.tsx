@@ -111,7 +111,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
                 onClick={() => setShowPriorityMenu(!showPriorityMenu)}
                 className="flex items-center text-gray-600 hover:text-blue-500 p-1 rounded-md focus:outline-none"
               >
-                <span className="text-sm mr-1">Priority</span>
+                <span className="text-sm mr-1 capitalize">{editedPriority}</span>
                 <ChevronDown className="h-4 w-4" />
               </button>
               {showPriorityMenu && (
