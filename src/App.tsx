@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TaskList from './TaskList';
 import AddTaskForm from './AddTaskForm';
-import { Search, Sun, Moon } from 'lucide-react';
+import { Search, Sun, Moon, ChevronDown } from 'lucide-react';
 import ListMenu from './ListMenu';
 import { Switch } from '@headlessui/react';
 
@@ -12,12 +12,18 @@ interface Task {
   priority: string;
 }
 
+type SortType = 'alphabetical' | 'priority';
+type SortDirection = 'asc' | 'desc';
+
 function App() {
   const [lists, setLists] = useState({ "My Tasks": [] });
   const [currentList, setCurrentList] = useState("My Tasks");
   const [tasks, setTasks] = useState<Task[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [darkMode, setDarkMode] = useState(false);
+  const [sortType, setSortType] = useState<SortType>('alphabetical');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
 
   useEffect(() => {
     if (darkMode) {
@@ -109,9 +115,35 @@ function App() {
     localStorage.removeItem(`${listName}-tasks`);
   };
 
-  const filteredTasks = tasks.filter((task) =>
+  const getSortedTasks = (tasks: Task[]) => {
+    return tasks.slice().sort((a, b) => {
+      if (sortType === 'alphabetical') {
+        return sortDirection === 'asc' 
+          ? a.text.localeCompare(b.text)
+          : b.text.localeCompare(a.text);
+      } else {
+        const priorityOrder = { high: 3, medium: 2, low: 1 };
+        return sortDirection === 'asc'
+          ? priorityOrder[a.priority] - priorityOrder[b.priority]
+          : priorityOrder[b.priority] - priorityOrder[a.priority];
+      }
+    });
+  };
+
+  const filteredTasks = getSortedTasks(tasks.filter((task) =>
     task.text.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ));
+
+  const toggleSortDirection = () => {
+    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+  };
+
+  const getSortLabel = () => {
+    if (sortType === 'alphabetical') {
+      return `Alphabetical (${sortDirection === 'asc' ? 'A-Z' : 'Z-A'})`;
+    }
+    return `Priority (${sortDirection === 'asc' ? 'Low to High' : 'High to Low'})`;
+  };
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-200`}>
@@ -147,19 +179,71 @@ function App() {
 
         <AddTaskForm addTask={addTask} />
         
-        <div className="relative mt-6">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-5 w-5 text-gray-400" />
+        <div className="flex items-center justify-between mt-6">
+          <div className="relative flex-1 mr-4">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              name="search"
+              id="search"
+              className="search-input"
+              placeholder="Search tasks"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
-          <input
-            type="text"
-            name="search"
-            id="search"
-            className="search-input"
-            placeholder="Search tasks"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <div className="relative">
+            <button
+              onClick={() => setIsSortMenuOpen(!isSortMenuOpen)}
+              className="flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            >
+              <span>Sort: {getSortLabel()}</span>
+              <ChevronDown className="h-4 w-4 ml-2" />
+            </button>
+            {isSortMenuOpen && (
+              <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                <div className="py-1">
+                  <button
+                    onClick={() => {
+                      setSortType('alphabetical');
+                      setIsSortMenuOpen(false);
+                    }}
+                    className={`block w-full px-4 py-2 text-left text-sm ${
+                      sortType === 'alphabetical'
+                        ? 'bg-blue-500 text-white'
+                        : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    Alphabetical
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSortType('priority');
+                      setIsSortMenuOpen(false);
+                    }}
+                    className={`block w-full px-4 py-2 text-left text-sm ${
+                      sortType === 'priority'
+                        ? 'bg-blue-500 text-white'
+                        : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    Priority
+                  </button>
+                  <button
+                    onClick={() => {
+                      toggleSortDirection();
+                      setIsSortMenuOpen(false);
+                    }}
+                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    Toggle Sort Direction
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="mt-6 space-y-3">
