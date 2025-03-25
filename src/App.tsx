@@ -43,7 +43,7 @@ function App() {
     setTasks([...tasks, newTask]);
   };
 
-  const toggleTask = (id: number) => {
+  const toggleComplete = (id: number) => {
     setTasks(
       tasks.map((task) =>
         task.id === id ? { ...task, completed: !task.completed } : task
@@ -53,6 +53,22 @@ function App() {
 
   const deleteTask = (id: number) => {
     setTasks(tasks.filter((task) => task.id !== id));
+  };
+
+  const updateTask = (id: number, newText: string) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, text: newText } : task
+      )
+    );
+  };
+
+  const updatePriority = (id: number, newPriority: string) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, priority: newPriority } : task
+      )
+    );
   };
 
   const createList = () => {
@@ -149,8 +165,10 @@ function App() {
         <div className="mt-6 space-y-3">
           <TaskList
             tasks={filteredTasks}
-            toggleTask={toggleTask}
+            toggleComplete={toggleComplete}
             deleteTask={deleteTask}
+            updateTask={updateTask}
+            updatePriority={updatePriority}
           />
         </div>
       </div>
