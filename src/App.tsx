@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import TaskList from './TaskList';
 import AddTaskForm from './AddTaskForm';
-import { Search } from 'lucide-react';
+import { Search, Sun, Moon } from 'lucide-react';
 import ListMenu from './ListMenu';
+import { Switch } from '@headlessui/react';
 
 interface Task {
   id: number;
@@ -16,6 +17,15 @@ function App() {
   const [currentList, setCurrentList] = useState("My Tasks");
   const [tasks, setTasks] = useState<Task[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [darkMode, setDarkMode] = useState(false);
+
+    useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   useEffect(() => {
     const storedTasks = localStorage.getItem(`${currentList}-tasks`);
@@ -88,7 +98,7 @@ function App() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'} flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8`}>
       <div className="max-w-md w-full space-y-8">
         <div className="flex justify-between items-center">
           <ListMenu
@@ -99,10 +109,30 @@ function App() {
             onRenameList={renameList}
             onDeleteList={deleteList}
           />
+          <Switch
+            checked={darkMode}
+            onChange={setDarkMode}
+            className={`${
+              darkMode ? 'bg-blue-600' : 'bg-gray-200'
+            } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+          >
+            <span
+              className={`${
+                darkMode ? 'translate-x-6' : 'translate-x-1'
+              } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+            />
+            <span className="absolute inset-0 flex items-center justify-center transition-opacity">
+              {darkMode ? (
+                <Moon className="h-4 w-4 text-gray-200" strokeWidth={2} />
+              ) : (
+                <Sun className="h-4 w-4 text-gray-700" strokeWidth={2} />
+              )}
+            </span>
+          </Switch>
         </div>
 
         <div>
-          <h1 className="text-center text-3xl font-extrabold text-gray-900">
+          <h1 className="text-center text-3xl font-extrabold">
             {currentList}
           </h1>
         </div>
